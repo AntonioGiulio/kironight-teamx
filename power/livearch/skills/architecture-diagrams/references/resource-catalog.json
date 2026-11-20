@@ -1,0 +1,80 @@
+{
+  "catalogVersion": "1.0.0",
+  "kinds": {
+    "cdn":            { "tier": 0, "mermaid": { "shape": "stadium",    "class": "edge" },        "archimate": "TechnologyService",   "drawio": { "fillColor": "#8C4FFF" } },
+    "dns":            { "tier": 0, "mermaid": { "shape": "stadium",    "class": "edge" },        "archimate": "TechnologyService",   "drawio": { "fillColor": "#8C4FFF" } },
+    "identity":       { "tier": 0, "mermaid": { "shape": "hexagon",    "class": "security" },    "archimate": "TechnologyService",   "drawio": { "fillColor": "#DD344C" } },
+    "external":       { "tier": 0, "mermaid": { "shape": "rounded",    "class": "external" },    "archimate": "Node",                "drawio": { "fillColor": "#7D8998" } },
+    "load-balancer":  { "tier": 1, "mermaid": { "shape": "hexagon",    "class": "network" },     "archimate": "Node",                "drawio": { "fillColor": "#8C4FFF" } },
+    "api-gateway":    { "tier": 1, "mermaid": { "shape": "hexagon",    "class": "network" },     "archimate": "TechnologyInterface", "drawio": { "fillColor": "#E7157B" } },
+    "compute":        { "tier": 2, "mermaid": { "shape": "rect",       "class": "compute" },     "archimate": "Node",                "drawio": { "fillColor": "#ED7100" } },
+    "container":      { "tier": 2, "mermaid": { "shape": "rect",       "class": "compute" },     "archimate": "SystemSoftware",      "drawio": { "fillColor": "#ED7100" } },
+    "function":       { "tier": 2, "mermaid": { "shape": "rounded",    "class": "compute" },     "archimate": "SystemSoftware",      "drawio": { "fillColor": "#ED7100" } },
+    "queue":          { "tier": 3, "mermaid": { "shape": "subroutine", "class": "integration" }, "archimate": "TechnologyService",   "drawio": { "fillColor": "#E7157B" } },
+    "topic":          { "tier": 3, "mermaid": { "shape": "subroutine", "class": "integration" }, "archimate": "TechnologyService",   "drawio": { "fillColor": "#E7157B" } },
+    "stream":         { "tier": 3, "mermaid": { "shape": "subroutine", "class": "integration" }, "archimate": "TechnologyService",   "drawio": { "fillColor": "#8C4FFF" } },
+    "database":       { "tier": 4, "mermaid": { "shape": "cylinder",   "class": "data" },        "archimate": "SystemSoftware",      "drawio": { "fillColor": "#C925D1" } },
+    "cache":          { "tier": 4, "mermaid": { "shape": "cylinder",   "class": "data" },        "archimate": "SystemSoftware",      "drawio": { "fillColor": "#C925D1" } },
+    "object-storage": { "tier": 4, "mermaid": { "shape": "cylinder",   "class": "data" },        "archimate": "Artifact",            "drawio": { "fillColor": "#7AA116" } },
+    "secret":         { "tier": 4, "mermaid": { "shape": "hexagon",    "class": "security" },    "archimate": "Artifact",            "drawio": { "fillColor": "#DD344C" } },
+    "monitoring":     { "tier": 5, "mermaid": { "shape": "rounded",    "class": "ops" },         "archimate": "TechnologyService",   "drawio": { "fillColor": "#E7157B" } }
+  },
+  "edgeKinds": {
+    "network-flow": { "mermaid": "-->",  "archimate": "Flow",        "drawio": { "dashed": false, "strokeWidth": 2 } },
+    "trigger":      { "mermaid": "==>",  "archimate": "Triggering",  "drawio": { "dashed": false, "strokeWidth": 3 } },
+    "data-access":  { "mermaid": "-.->", "archimate": "Access",      "drawio": { "dashed": true,  "strokeWidth": 1 } },
+    "depends-on":   { "mermaid": "---",  "archimate": "Association", "drawio": { "dashed": true,  "strokeWidth": 1 } }
+  },
+  "groupKinds": {
+    "account":     { "drawio": { "grIcon": "mxgraph.aws4.group_account",  "strokeColor": "#CD2264" }, "archimate": "Grouping" },
+    "region":      { "drawio": { "grIcon": "mxgraph.aws4.group_region",   "strokeColor": "#00A4A6" }, "archimate": "Grouping" },
+    "environment": { "drawio": { "grIcon": "mxgraph.aws4.group_aws_cloud", "strokeColor": "#232F3E" }, "archimate": "Grouping" },
+    "network":     { "drawio": { "grIcon": "mxgraph.aws4.group_vpc2",     "strokeColor": "#8C4FFF" }, "archimate": "Grouping" },
+    "subnet":      { "drawio": { "grIcon": "mxgraph.aws4.group_security_group", "strokeColor": "#7AA116" }, "archimate": "Grouping" },
+    "module":      { "drawio": { "grIcon": "mxgraph.aws4.group_on_premise", "strokeColor": "#7D8998" }, "archimate": "Grouping" }
+  },
+  "resources": [
+    { "iacType": "aws_api_gateway_rest_api",     "aliases": ["AWS::ApiGateway::RestApi"],                 "provider": "aws", "kind": "api-gateway",    "label": "API Gateway",  "drawio": { "resIcon": "mxgraph.aws4.api_gateway" },            "properties": ["endpoint_configuration"] },
+    { "iacType": "aws_apigatewayv2_api",         "aliases": ["AWS::ApiGatewayV2::Api"],                   "provider": "aws", "kind": "api-gateway",    "label": "HTTP API",     "drawio": { "resIcon": "mxgraph.aws4.api_gateway" },            "properties": ["protocol_type"] },
+    { "iacType": "aws_cloudfront_distribution",  "aliases": ["AWS::CloudFront::Distribution"],            "provider": "aws", "kind": "cdn",            "label": "CloudFront",   "drawio": { "resIcon": "mxgraph.aws4.cloudfront" },             "properties": ["price_class"] },
+    { "iacType": "aws_cloudwatch_metric_alarm",  "aliases": ["AWS::CloudWatch::Alarm"],                   "provider": "aws", "kind": "monitoring",     "label": "CloudWatch Alarm", "drawio": { "resIcon": "mxgraph.aws4.cloudwatch_2" },       "properties": ["metric_name"] },
+    { "iacType": "aws_cognito_user_pool",        "aliases": ["AWS::Cognito::UserPool"],                   "provider": "aws", "kind": "identity",       "label": "Cognito",      "drawio": { "resIcon": "mxgraph.aws4.cognito" },                "properties": [] },
+    { "iacType": "aws_db_instance",              "aliases": ["AWS::RDS::DBInstance"],                     "provider": "aws", "kind": "database",       "label": "RDS",          "drawio": { "resIcon": "mxgraph.aws4.rds" },                    "properties": ["engine", "instance_class", "multi_az"] },
+    { "iacType": "aws_dynamodb_table",           "aliases": ["AWS::DynamoDB::Table"],                     "provider": "aws", "kind": "database",       "label": "DynamoDB",     "drawio": { "resIcon": "mxgraph.aws4.dynamodb" },               "properties": ["billing_mode"] },
+    { "iacType": "aws_ecs_service",              "aliases": ["AWS::ECS::Service"],                        "provider": "aws", "kind": "container",      "label": "ECS Service",  "drawio": { "resIcon": "mxgraph.aws4.ecs" },                    "properties": ["launch_type", "desired_count"] },
+    { "iacType": "aws_eks_cluster",              "aliases": ["AWS::EKS::Cluster"],                        "provider": "aws", "kind": "container",      "label": "EKS",          "drawio": { "resIcon": "mxgraph.aws4.eks" },                    "properties": ["version"] },
+    { "iacType": "aws_elasticache_cluster",      "aliases": ["AWS::ElastiCache::CacheCluster"],           "provider": "aws", "kind": "cache",          "label": "ElastiCache",  "drawio": { "resIcon": "mxgraph.aws4.elasticache" },            "properties": ["engine", "node_type"] },
+    { "iacType": "aws_instance",                 "aliases": ["AWS::EC2::Instance"],                       "provider": "aws", "kind": "compute",        "label": "EC2",          "drawio": { "resIcon": "mxgraph.aws4.ec2" },                    "properties": ["instance_type"] },
+    { "iacType": "aws_kinesis_stream",           "aliases": ["AWS::Kinesis::Stream"],                     "provider": "aws", "kind": "stream",         "label": "Kinesis",      "drawio": { "resIcon": "mxgraph.aws4.kinesis_data_streams" },   "properties": ["shard_count"] },
+    { "iacType": "aws_lambda_function",          "aliases": ["AWS::Lambda::Function"],                    "provider": "aws", "kind": "function",       "label": "Lambda",       "drawio": { "resIcon": "mxgraph.aws4.lambda" },                 "properties": ["runtime", "memory_size"] },
+    { "iacType": "aws_lb",                       "aliases": ["AWS::ElasticLoadBalancingV2::LoadBalancer"], "provider": "aws", "kind": "load-balancer", "label": "Load Balancer", "drawio": { "resIcon": "mxgraph.aws4.elastic_load_balancing" }, "properties": ["load_balancer_type", "internal"] },
+    { "iacType": "aws_rds_cluster",              "aliases": ["AWS::RDS::DBCluster"],                      "provider": "aws", "kind": "database",       "label": "Aurora",       "drawio": { "resIcon": "mxgraph.aws4.aurora" },                 "properties": ["engine"] },
+    { "iacType": "aws_route53_zone",             "aliases": ["AWS::Route53::HostedZone"],                 "provider": "aws", "kind": "dns",            "label": "Route 53",     "drawio": { "resIcon": "mxgraph.aws4.route_53" },               "properties": [] },
+    { "iacType": "aws_s3_bucket",                "aliases": ["AWS::S3::Bucket"],                          "provider": "aws", "kind": "object-storage", "label": "S3",           "drawio": { "resIcon": "mxgraph.aws4.s3" },                     "properties": [] },
+    { "iacType": "aws_secretsmanager_secret",    "aliases": ["AWS::SecretsManager::Secret"],              "provider": "aws", "kind": "secret",         "label": "Secrets Manager", "drawio": { "resIcon": "mxgraph.aws4.secrets_manager" },     "properties": [] },
+    { "iacType": "aws_sns_topic",                "aliases": ["AWS::SNS::Topic"],                          "provider": "aws", "kind": "topic",          "label": "SNS",          "drawio": { "resIcon": "mxgraph.aws4.sns" },                    "properties": ["fifo_topic"] },
+    { "iacType": "aws_sqs_queue",                "aliases": ["AWS::SQS::Queue"],                          "provider": "aws", "kind": "queue",          "label": "SQS",          "drawio": { "resIcon": "mxgraph.aws4.sqs" },                    "properties": ["fifo_queue"] }
+  ],
+  "groups": [
+    { "iacType": "aws_vpc",    "aliases": ["AWS::EC2::VPC"],    "provider": "aws", "groupKind": "network", "label": "VPC",    "membership": "vpc_id" },
+    { "iacType": "aws_subnet", "aliases": ["AWS::EC2::Subnet"], "provider": "aws", "groupKind": "subnet",  "label": "Subnet", "membership": "subnet_id" }
+  ],
+  "hidden": [
+    { "iacType": "aws_lb_listener",                  "aliases": ["AWS::ElasticLoadBalancingV2::Listener"],    "edgeInference": "lb-listener" },
+    { "iacType": "aws_lb_target_group",              "aliases": ["AWS::ElasticLoadBalancingV2::TargetGroup"], "edgeInference": "lb-listener" },
+    { "iacType": "aws_lambda_event_source_mapping",  "aliases": ["AWS::Lambda::EventSourceMapping"],          "edgeInference": "event-source" },
+    { "iacType": "aws_sns_topic_subscription",       "aliases": ["AWS::SNS::Subscription"],                   "edgeInference": "subscription" },
+    { "iacType": "aws_security_group",               "aliases": ["AWS::EC2::SecurityGroup"],                  "edgeInference": "sg-ingress" },
+    { "iacType": "aws_vpc_security_group_ingress_rule", "aliases": ["AWS::EC2::SecurityGroupIngress"],       "edgeInference": "sg-ingress" },
+    { "iacType": "aws_ecs_cluster",                  "aliases": ["AWS::ECS::Cluster"],                        "edgeInference": null },
+    { "iacType": "aws_ecs_task_definition",          "aliases": ["AWS::ECS::TaskDefinition"],                 "edgeInference": null },
+    { "iacType": "aws_db_subnet_group",              "aliases": ["AWS::RDS::DBSubnetGroup"],                  "edgeInference": null },
+    { "iacType": "aws_internet_gateway",             "aliases": ["AWS::EC2::InternetGateway"],                "edgeInference": null },
+    { "iacType": "aws_nat_gateway",                  "aliases": ["AWS::EC2::NatGateway"],                     "edgeInference": null },
+    { "iacType": "aws_eip",                          "aliases": ["AWS::EC2::EIP"],                            "edgeInference": null },
+    { "iacType": "aws_lambda_permission",            "aliases": ["AWS::Lambda::Permission"],                  "edgeInference": null },
+    { "iacType": "aws_cloudwatch_log_group",         "aliases": ["AWS::Logs::LogGroup"],                      "edgeInference": null },
+    { "iacType": "aws_route",                        "aliases": ["AWS::EC2::Route"],                          "edgeInference": null }
+  ],
+  "hiddenPrefixes": ["aws_iam_", "aws_route_table", "aws_s3_bucket_", "aws_kms_", "AWS::IAM::", "AWS::KMS::", "AWS::EC2::RouteTable", "AWS::EC2::SubnetRouteTableAssociation", "AWS::CDK::", "random_", "null_", "terraform_data", "time_"]
+}

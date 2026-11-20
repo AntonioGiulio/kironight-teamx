@@ -1,0 +1,90 @@
+<mxfile host="livearch" agent="livearch/0.1.0">
+  <diagram id="livearch" name="Architecture">
+    <mxGraphModel grid="1" gridSize="10" guides="1" connect="1" arrows="1" page="0" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <object id="la__meta" label="LiveArch · catalog 1.0.0 · model 4f54c063a86e" livearch_managed="meta">
+          <mxCell style="text;html=1;fontSize=9;fontColor=#7D8998;" vertex="1" parent="1">
+            <mxGeometry x="40" y="5" width="360" height="20" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_aws_subnet_private" label="private · Subnet" livearch_id="aws_subnet.private" livearch_managed="1" livearch_kind="subnet" livearch_style_hash="9ab1b917520e">
+          <mxCell style="outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;strokeColor=#7AA116;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#7AA116;dashed=0;" vertex="1" parent="la_aws_vpc_main">
+            <mxGeometry x="30" y="50" width="400" height="220" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_aws_subnet_public" label="public · Subnet" livearch_id="aws_subnet.public" livearch_managed="1" livearch_kind="subnet" livearch_style_hash="9ab1b917520e">
+          <mxCell style="outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;strokeColor=#7AA116;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#7AA116;dashed=0;" vertex="1" parent="la_aws_vpc_main">
+            <mxGeometry x="460" y="50" width="230" height="220" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_aws_vpc_main" label="main · VPC" livearch_id="aws_vpc.main" livearch_managed="1" livearch_kind="network" livearch_style_hash="bca40d582c23">
+          <mxCell style="outlineConnect=0;gradientColor=none;html=1;whiteSpace=wrap;fontSize=12;fontStyle=0;container=1;pointerEvents=0;collapsible=0;recursiveResize=0;shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc2;strokeColor=#8C4FFF;fillColor=none;verticalAlign=top;align=left;spacingLeft=30;fontColor=#8C4FFF;dashed=0;" vertex="1" parent="1">
+            <mxGeometry x="40" y="210" width="720" height="300" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_aws_db_instance_orders_db" label="orders_db&lt;br&gt;RDS" livearch_id="aws_db_instance.orders_db" livearch_managed="1" livearch_kind="database" livearch_style_hash="8acbadade7dc">
+          <mxCell style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#C925D1;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.rds;" vertex="1" parent="la_aws_subnet_private">
+            <mxGeometry x="246" y="60" width="78" height="78" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_aws_ecs_service_api" label="api&lt;br&gt;ECS Service" livearch_id="aws_ecs_service.api" livearch_managed="1" livearch_kind="container" livearch_style_hash="d801b98d44e8">
+          <mxCell style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ecs;" vertex="1" parent="la_aws_subnet_private">
+            <mxGeometry x="76" y="60" width="78" height="78" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_aws_lambda_function_order_worker" label="order_worker&lt;br&gt;Lambda" livearch_id="aws_lambda_function.order_worker" livearch_managed="1" livearch_kind="function" livearch_style_hash="1c68a1a9ae84">
+          <mxCell style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;" vertex="1" parent="1">
+            <mxGeometry x="86" y="50" width="78" height="78" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_aws_lb_public" label="public&lt;br&gt;Load Balancer" livearch_id="aws_lb.public" livearch_managed="1" livearch_kind="load-balancer" livearch_style_hash="b0b50a3f67e7">
+          <mxCell style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#8C4FFF;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.elastic_load_balancing;" vertex="1" parent="la_aws_subnet_public">
+            <mxGeometry x="76" y="60" width="78" height="78" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_aws_s3_bucket_assets" label="assets&lt;br&gt;S3" livearch_id="aws_s3_bucket.assets" livearch_managed="1" livearch_kind="object-storage" livearch_style_hash="30744288f1c9">
+          <mxCell style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#7AA116;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;" vertex="1" parent="1">
+            <mxGeometry x="426" y="50" width="78" height="78" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_aws_sqs_queue_orders" label="orders&lt;br&gt;SQS" livearch_id="aws_sqs_queue.orders" livearch_managed="1" livearch_kind="queue" livearch_style_hash="bc36524f599a">
+          <mxCell style="sketch=0;outlineConnect=0;fontColor=#232F3E;gradientColor=none;fillColor=#E7157B;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;fontSize=12;fontStyle=0;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.sqs;" vertex="1" parent="1">
+            <mxGeometry x="256" y="50" width="78" height="78" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_e_aws_ecs_service_api__data_access___aws_s3_bucket_assets" label="" livearch_id="aws_ecs_service.api--data-access--&gt;aws_s3_bucket.assets" livearch_managed="1" livearch_kind="data-access" livearch_style_hash="4215a8be1882">
+          <mxCell style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;endFill=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="la_aws_ecs_service_api" target="la_aws_s3_bucket_assets">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_e_aws_ecs_service_api__data_access___aws_sqs_queue_orders" label="" livearch_id="aws_ecs_service.api--data-access--&gt;aws_sqs_queue.orders" livearch_managed="1" livearch_kind="data-access" livearch_style_hash="4215a8be1882">
+          <mxCell style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;endFill=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="la_aws_ecs_service_api" target="la_aws_sqs_queue_orders">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_e_aws_ecs_service_api__network_flow___aws_db_instance_orders_db" label="TCP 5432" livearch_id="aws_ecs_service.api--network-flow--&gt;aws_db_instance.orders_db" livearch_managed="1" livearch_kind="network-flow" livearch_style_hash="b03710ef7978">
+          <mxCell style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;endFill=1;strokeWidth=2;dashed=0;" edge="1" parent="1" source="la_aws_ecs_service_api" target="la_aws_db_instance_orders_db">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_e_aws_lambda_function_order_worker__data_access___aws_s3_bucket_assets" label="" livearch_id="aws_lambda_function.order_worker--data-access--&gt;aws_s3_bucket.assets" livearch_managed="1" livearch_kind="data-access" livearch_style_hash="4215a8be1882">
+          <mxCell style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;endFill=1;strokeWidth=1;dashed=1;" edge="1" parent="1" source="la_aws_lambda_function_order_worker" target="la_aws_s3_bucket_assets">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_e_aws_lb_public__network_flow___aws_ecs_service_api" label="HTTP 80" livearch_id="aws_lb.public--network-flow--&gt;aws_ecs_service.api" livearch_managed="1" livearch_kind="network-flow" livearch_style_hash="b03710ef7978">
+          <mxCell style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;endFill=1;strokeWidth=2;dashed=0;" edge="1" parent="1" source="la_aws_lb_public" target="la_aws_ecs_service_api">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="la_e_aws_sqs_queue_orders__trigger___aws_lambda_function_order_worker" label="" livearch_id="aws_sqs_queue.orders--trigger--&gt;aws_lambda_function.order_worker" livearch_managed="1" livearch_kind="trigger" livearch_style_hash="15432055ba63">
+          <mxCell style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#545B64;endArrow=block;endFill=1;strokeWidth=3;dashed=0;" edge="1" parent="1" source="la_aws_sqs_queue_orders" target="la_aws_lambda_function_order_worker">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

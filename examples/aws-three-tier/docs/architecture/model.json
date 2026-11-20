@@ -1,0 +1,163 @@
+{
+  "modelVersion": "1.0.0",
+  "generator": {
+    "name": "livearch",
+    "version": "0.1.0",
+    "catalogVersion": "1.0.0"
+  },
+  "source": {
+    "adapters": ["terraform"],
+    "commit": null,
+    "files": [
+      { "path": "terraform/app.tf", "sha256": "042a0f4eb2d8eeac2f401d76cae1890bb2e6d755ae50f857eb14913710f9c786" },
+      { "path": "terraform/data.tf", "sha256": "5abf5ccca863337497cefa316abfd6e290a876dc6c18c8eba527f1e848362d80" },
+      { "path": "terraform/network.tf", "sha256": "412c30eac08371f4846939569a6711f8b2610ffda3f1542655156f5dcaba982c" },
+      { "path": "terraform/worker.tf", "sha256": "df12383b2364120a5b45176f5aa0befa353d8ea47399a101e84152d564a7c195" }
+    ]
+  },
+  "groups": [
+    {
+      "id": "aws_subnet.private",
+      "diagramId": "la_aws_subnet_private",
+      "kind": "subnet",
+      "label": "private",
+      "parent": "aws_vpc.main",
+      "iacType": "aws_subnet"
+    },
+    {
+      "id": "aws_subnet.public",
+      "diagramId": "la_aws_subnet_public",
+      "kind": "subnet",
+      "label": "public",
+      "parent": "aws_vpc.main",
+      "iacType": "aws_subnet"
+    },
+    {
+      "id": "aws_vpc.main",
+      "diagramId": "la_aws_vpc_main",
+      "kind": "network",
+      "label": "main",
+      "parent": null,
+      "iacType": "aws_vpc"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "aws_db_instance.orders_db",
+      "diagramId": "la_aws_db_instance_orders_db",
+      "kind": "database",
+      "label": "orders_db",
+      "iacType": "aws_db_instance",
+      "provider": "aws",
+      "group": "aws_subnet.private",
+      "source": { "file": "terraform/data.tf", "line": 6 },
+      "properties": { "engine": "postgres", "instance_class": "db.t4g.micro", "multi_az": false }
+    },
+    {
+      "id": "aws_ecs_service.api",
+      "diagramId": "la_aws_ecs_service_api",
+      "kind": "container",
+      "label": "api",
+      "iacType": "aws_ecs_service",
+      "provider": "aws",
+      "group": "aws_subnet.private",
+      "source": { "file": "terraform/app.tf", "line": 67 },
+      "properties": { "launch_type": "FARGATE", "desired_count": 2 }
+    },
+    {
+      "id": "aws_lambda_function.order_worker",
+      "diagramId": "la_aws_lambda_function_order_worker",
+      "kind": "function",
+      "label": "order_worker",
+      "iacType": "aws_lambda_function",
+      "provider": "aws",
+      "group": null,
+      "source": { "file": "terraform/worker.tf", "line": 16 },
+      "properties": { "runtime": "python3.12", "memory_size": 256 }
+    },
+    {
+      "id": "aws_lb.public",
+      "diagramId": "la_aws_lb_public",
+      "kind": "load-balancer",
+      "label": "public",
+      "iacType": "aws_lb",
+      "provider": "aws",
+      "group": "aws_subnet.public",
+      "source": { "file": "terraform/app.tf", "line": 1 },
+      "properties": { "load_balancer_type": "application", "internal": false }
+    },
+    {
+      "id": "aws_s3_bucket.assets",
+      "diagramId": "la_aws_s3_bucket_assets",
+      "kind": "object-storage",
+      "label": "assets",
+      "iacType": "aws_s3_bucket",
+      "provider": "aws",
+      "group": null,
+      "source": { "file": "terraform/data.tf", "line": 20 },
+      "properties": {}
+    },
+    {
+      "id": "aws_sqs_queue.orders",
+      "diagramId": "la_aws_sqs_queue_orders",
+      "kind": "queue",
+      "label": "orders",
+      "iacType": "aws_sqs_queue",
+      "provider": "aws",
+      "group": null,
+      "source": { "file": "terraform/data.tf", "line": 32 },
+      "properties": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "aws_ecs_service.api--data-access-->aws_s3_bucket.assets",
+      "diagramId": "la_e_aws_ecs_service_api__data_access___aws_s3_bucket_assets",
+      "from": "aws_ecs_service.api",
+      "to": "aws_s3_bucket.assets",
+      "kind": "data-access",
+      "label": null
+    },
+    {
+      "id": "aws_ecs_service.api--data-access-->aws_sqs_queue.orders",
+      "diagramId": "la_e_aws_ecs_service_api__data_access___aws_sqs_queue_orders",
+      "from": "aws_ecs_service.api",
+      "to": "aws_sqs_queue.orders",
+      "kind": "data-access",
+      "label": null
+    },
+    {
+      "id": "aws_ecs_service.api--network-flow-->aws_db_instance.orders_db",
+      "diagramId": "la_e_aws_ecs_service_api__network_flow___aws_db_instance_orders_db",
+      "from": "aws_ecs_service.api",
+      "to": "aws_db_instance.orders_db",
+      "kind": "network-flow",
+      "label": "TCP 5432"
+    },
+    {
+      "id": "aws_lambda_function.order_worker--data-access-->aws_s3_bucket.assets",
+      "diagramId": "la_e_aws_lambda_function_order_worker__data_access___aws_s3_bucket_assets",
+      "from": "aws_lambda_function.order_worker",
+      "to": "aws_s3_bucket.assets",
+      "kind": "data-access",
+      "label": null
+    },
+    {
+      "id": "aws_lb.public--network-flow-->aws_ecs_service.api",
+      "diagramId": "la_e_aws_lb_public__network_flow___aws_ecs_service_api",
+      "from": "aws_lb.public",
+      "to": "aws_ecs_service.api",
+      "kind": "network-flow",
+      "label": "HTTP 80"
+    },
+    {
+      "id": "aws_sqs_queue.orders--trigger-->aws_lambda_function.order_worker",
+      "diagramId": "la_e_aws_sqs_queue_orders__trigger___aws_lambda_function_order_worker",
+      "from": "aws_sqs_queue.orders",
+      "to": "aws_lambda_function.order_worker",
+      "kind": "trigger",
+      "label": null
+    }
+  ],
+  "warnings": []
+}

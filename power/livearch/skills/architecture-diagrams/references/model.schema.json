@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/AntonioGiulio/kironight-teamx/power/livearch/model.schema.json",
+  "title": "LiveArch architecture model",
+  "description": "Canonical intermediate representation produced from IaC and consumed by every renderer. Normative: see .kiro/steering/architecture-model.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["modelVersion", "generator", "source", "groups", "nodes", "edges", "warnings"],
+  "properties": {
+    "modelVersion": { "const": "1.0.0" },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "catalogVersion"],
+      "properties": {
+        "name": { "const": "livearch" },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "catalogVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapters", "commit", "files"],
+      "properties": {
+        "adapters": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["terraform", "cdk", "cloudformation"] }
+        },
+        "commit": { "type": ["string", "null"], "pattern": "^[0-9a-f]{7,40}$" },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": { "type": "string", "description": "Path relative to the IaC repo root, forward slashes." },
+              "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+            }
+          }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "description": "Sorted by id.",
+      "items": { "$ref": "#/$defs/group" }
+    },
+    "nodes": {
+      "type": "array",
+      "description": "Sorted by id.",
+      "items": { "$ref": "#/$defs/node" }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Sorted by id.",
+      "items": { "$ref": "#/$defs/edge" }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/warning" }
+    }
+  },
+  "$defs": {
+    "diagramId": { "type": "string", "pattern": "^la_[A-Za-z0-9_]+$" },
+    "edgeDiagramId": { "type": "string", "pattern": "^la_e_[A-Za-z0-9_]+$" },
+    "nodeKind": {
+      "enum": [
+        "compute", "container", "function", "load-balancer", "api-gateway", "database", "cache",
+        "object-storage", "queue", "topic", "stream", "cdn", "dns", "identity", "secret", "monitoring", "external"
+      ]
+    },
+    "groupKind": { "enum": ["account", "region", "network", "subnet", "environment", "module"] },
+    "edgeKind": { "enum": ["network-flow", "data-access", "trigger", "depends-on"] },
+    "sourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "line"],
+      "properties": {
+        "file": { "type": "string" },
+        "line": { "type": ["integer", "null"], "minimum": 1 }
+      }
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "diagramId", "kind", "label", "parent", "iacType"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "diagramId": { "$ref": "#/$defs/diagramId" },
+        "kind": { "$ref": "#/$defs/groupKind" },
+        "label": { "type": "string", "maxLength": 40 },
+        "parent": { "type": ["string", "null"], "description": "id of the parent group; must exist; no cycles." },
+        "iacType": { "type": ["string", "null"] }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "diagramId", "kind", "label", "iacType", "provider", "group", "source", "properties"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "description": "IaC address (Terraform) or <Stack>.<LogicalId> (CloudFormation/CDK)." },
+        "diagramId": { "$ref": "#/$defs/diagramId" },
+        "kind": { "$ref": "#/$defs/nodeKind" },
+        "label": { "type": "string", "maxLength": 40 },
+        "iacType": { "type": "string" },
+        "provider": { "type": "string" },
+        "group": { "type": ["string", "null"] },
+        "source": { "$ref": "#/$defs/sourceRef" },
+        "properties": {
+          "type": "object",
+          "description": "Only keys listed in the catalog allowlist for this iacType, plus 'instances', 'unmapped', 'unresolved'.",
+          "additionalProperties": { "type": ["string", "number", "boolean"] }
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "diagramId", "from", "to", "kind", "label"],
+      "properties": {
+        "id": { "type": "string", "description": "<from>--<kind>--><to>" },
+        "diagramId": { "$ref": "#/$defs/edgeDiagramId" },
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "kind": { "$ref": "#/$defs/edgeKind" },
+        "label": { "type": ["string", "null"], "maxLength": 30 }
+      }
+    },
+    "warning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "ref"],
+      "properties": {
+        "code": { "enum": ["UNMAPPED_TYPE", "REMOTE_MODULE", "UNRESOLVED_EXPRESSION", "STALE_SYNTH", "PARSE_ERROR"] },
+        "message": { "type": "string" },
+        "ref": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

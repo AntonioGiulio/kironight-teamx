@@ -1,0 +1,28 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "livearch",
+  "version": "0.1.0",
+  "description": "Rebuild and keep up to date the architecture diagram of an Infrastructure as Code repository (Terraform, AWS CDK, CloudFormation) as draw.io, Mermaid and ArchiMate (Archi) files, all rendered from one canonical model.",
+  "author": {
+    "name": "KiroNight Team X",
+    "url": "https://github.com/AntonioGiulio/kironight-teamx"
+  },
+  "keywords": [
+    "architecture diagram",
+    "diagram",
+    "drawio",
+    "draw.io",
+    "mermaid",
+    "archimate",
+    "archi",
+    "terraform",
+    "cdk",
+    "cloudformation",
+    "iac",
+    "infrastructure as code",
+    "architecture"
+  ],
+  "homepage": "https://github.com/AntonioGiulio/kironight-teamx/tree/main/power/livearch",
+  "repository": "https://github.com/AntonioGiulio/kironight-teamx",
+  "license": "Apache-2.0"
+}

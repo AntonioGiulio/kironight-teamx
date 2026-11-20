@@ -1,0 +1,26 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "livearch-sync-on-iac-change",
+      "description": "When the agent saves an IaC file, run an incremental LiveArch sync of docs/architecture/.",
+      "trigger": "PostFileSave",
+      "matcher": "(\\.tf$|(^|/)cdk\\.out/[^/]+\\.template\\.json$|\\.template\\.(json|ya?ml)$)",
+      "action": {
+        "type": "agent",
+        "prompt": "An Infrastructure as Code file was just saved. Use the architecture-diagrams skill to run an INCREMENTAL sync of docs/architecture/: rebuild model.json for the changed files, compute the changeset, render with scripts/render.py and validate with scripts/validate_architecture.py. Do not modify any IaC file and do not edit the diagram files directly. If the IaC does not parse, leave docs/architecture/ untouched and report PARSE_ERROR. End with the changeset in at most 5 lines."
+      }
+    },
+    {
+      "name": "livearch-block-manual-diagram-writes",
+      "description": "Generated diagrams must come from render.py, never from direct agent file writes.",
+      "trigger": "PreToolUse",
+      "matcher": "write",
+      "action": {
+        "type": "command",
+        "command": "python3 -c \"import json,re,sys; d=json.load(sys.stdin); p=json.dumps(d.get('tool_input',{})); m=re.search(r'docs/architecture/architecture\\.(drawio|mmd|archimate\\.xml)', p); sys.stderr.write('LiveArch: diagrams are generated. Update docs/architecture/model.json and run scripts/render.py from the architecture-diagrams skill.\\n') if m else None; sys.exit(2 if m else 0)\""
+      },
+      "timeout": 10
+    }
+  ]
+}
