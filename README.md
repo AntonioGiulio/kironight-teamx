@@ -6,6 +6,8 @@ and keeps its architecture diagram **always up to date** as **draw.io**, **Merma
 KiroNight challenge: *build the context, not the code*. This repo is mostly Kiro context. Start from
 [`docs/context-map.md`](docs/context-map.md).
 
+**Kiro Night:** [presentazione 3D interattiva in italiano](presentazione/README.md).
+
 ## What's inside
 | Artifact | Where | Role |
 |----------|-------|------|
