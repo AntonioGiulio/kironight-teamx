@@ -1,0 +1,33 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "catalog-or-schema-changed",
+      "description": "Keep catalog, schema, steering, power references, specs and golden example aligned.",
+      "trigger": "PostFileSave",
+      "matcher": "(resource-catalog|model\\.schema)\\.json$",
+      "action": {
+        "type": "agent",
+        "prompt": "The LiveArch catalog or model schema changed. Before finishing: (1) run `python3 power/livearch/skills/architecture-diagrams/scripts/validate_architecture.py --catalog` and fix every error; (2) bump `catalogVersion` (patch = mapping fix, minor = new types, major = removed/renamed kinds) and the same value in the golden example model; (3) if kinds, edge kinds or ID rules changed, update `.kiro/steering/architecture-model.md`, `.kiro/steering/diagram-conventions.md` and `power/livearch/skills/architecture-diagrams/references/model-building.md` so they say the same thing; (4) re-render the golden example with scripts/render.py; (5) if behaviour changed, add or update the acceptance criteria in the affected spec (MOD or REN) and its tasks. Use the add-resource-mapping skill for new resource types."
+      }
+    },
+    {
+      "name": "design-rules-changed",
+      "description": "Design steering and the Power's operational reference must not drift apart.",
+      "trigger": "PostFileSave",
+      "matcher": "(\\.kiro/steering/(architecture-model|iac-sources|diagram-conventions)\\.md|references/(model-building|drawio-format|mermaid-format|archimate-format)\\.md)$",
+      "action": {
+        "type": "agent",
+        "prompt": "A LiveArch rule document changed. The design steering (.kiro/steering/architecture-model.md, iac-sources.md, diagram-conventions.md) and the Power's operational references (power/livearch/skills/architecture-diagrams/references/*.md) must state the same rules: the steering explains why, the references explain how. Compare the changed section with its counterpart and align the other file. If the change alters behaviour, check that render.py / validate_architecture.py still implement it and that a spec acceptance criterion covers it. List what you aligned in at most 3 lines."
+      }
+    },
+    {
+      "name": "spec-traceability",
+      "description": "Every acceptance criterion must be EARS-formed and covered by a task.",
+      "trigger": "PostFileSave",
+      "matcher": "\\.kiro/specs/[^/]+/(requirements|tasks)\\.md$",
+      "action": { "type": "command", "command": "python3 .kiro/hooks/scripts/check_spec_traceability.py" },
+      "timeout": 20
+    }
+  ]
+}

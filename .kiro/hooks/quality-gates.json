@@ -1,0 +1,23 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "validate-golden-example-on-save",
+      "description": "Any change to the catalog, schema, scripts or golden example re-validates the golden example immediately.",
+      "trigger": "PostFileSave",
+      "matcher": "(power/livearch/skills/architecture-diagrams/(references|scripts)/|examples/[^/]+/docs/architecture/)",
+      "action": {
+        "type": "command",
+        "command": "python3 power/livearch/skills/architecture-diagrams/scripts/validate_architecture.py examples/aws-three-tier/docs/architecture"
+      },
+      "timeout": 30
+    },
+    {
+      "name": "stop-gate",
+      "description": "The agent cannot end its turn while the catalog, the golden example, rendering idempotency or spec traceability are broken.",
+      "trigger": "Stop",
+      "action": { "type": "command", "command": "python3 .kiro/hooks/scripts/stop_gate.py" },
+      "timeout": 60
+    }
+  ]
+}
