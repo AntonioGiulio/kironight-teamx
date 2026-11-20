@@ -15,7 +15,7 @@
       "name": "design-rules-changed",
       "description": "Design steering and the Power's operational reference must not drift apart.",
       "trigger": "PostFileSave",
-      "matcher": "(\\.kiro/steering/(architecture-model|iac-sources|diagram-conventions)\\.md|references/(model-building|drawio-format|mermaid-format|archimate-format)\\.md)$",
+      "matcher": "(\\.kiro/steering/(architecture-model|iac-sources|diagram-conventions)\\.md|references/(model-building|drawio-format|mermaid-format|archify-format)\\.md)$",
       "action": {
         "type": "agent",
         "prompt": "A LiveArch rule document changed. The design steering (.kiro/steering/architecture-model.md, iac-sources.md, diagram-conventions.md) and the Power's operational references (power/livearch/skills/architecture-diagrams/references/*.md) must state the same rules: the steering explains why, the references explain how. Compare the changed section with its counterpart and align the other file. If the change alters behaviour, check that render.py / validate_architecture.py still implement it and that a spec acceptance criterion covers it. List what you aligned in at most 3 lines."

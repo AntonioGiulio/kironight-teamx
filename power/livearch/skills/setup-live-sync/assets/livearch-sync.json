@@ -18,7 +18,7 @@
       "matcher": "write",
       "action": {
         "type": "command",
-        "command": "python3 -c \"import json,re,sys; d=json.load(sys.stdin); p=json.dumps(d.get('tool_input',{})); m=re.search(r'docs/architecture/architecture\\.(drawio|mmd|archimate\\.xml)', p); sys.stderr.write('LiveArch: diagrams are generated. Update docs/architecture/model.json and run scripts/render.py from the architecture-diagrams skill.\\n') if m else None; sys.exit(2 if m else 0)\""
+        "command": "python3 -c \"import json,re,sys; d=json.load(sys.stdin); p=json.dumps(d.get('tool_input',{})); m=re.search(r'docs/architecture/architecture\\.(drawio|mmd|archify\\.json|html)', p); sys.stderr.write('LiveArch: diagrams are generated. Update docs/architecture/model.json and run scripts/render.py from the architecture-diagrams skill.\\n') if m else None; sys.exit(2 if m else 0)\""
       },
       "timeout": 10
     }

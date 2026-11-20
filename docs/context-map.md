@@ -20,7 +20,7 @@ flowchart LR
     SCH[model.schema.json]
     CAT[resource-catalog.json]
     MB[model-building.md]
-    FMT[drawio / mermaid / archimate format guides]
+    FMT[drawio / mermaid / archify format guides]
   end
   subgraph Specs[".kiro/specs"]
     ING[iac-ingestion ING]

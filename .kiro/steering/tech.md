@@ -10,6 +10,7 @@ inclusion: always
 | Power | Formato **Agent Plugins 1.0** (`plugin.json`, `skills/`) | MVP | in `power/livearch/` |
 | Skill del Power | Agent Skills (`SKILL.md` + `references/` + `scripts/` + `assets/`) | MVP | |
 | Renderer, validatore, changeset | **Python 3.10+, solo standard library** (`scripts/render.py`, `validate_architecture.py`, `changeset.py`) | MVP | implementazione di riferimento, deterministica |
+| Vista interattiva | **[Archify](https://github.com/tt-a1i/archify)** 3.x (Node.js), chiamato da `render.py` | MVP | facoltativo: senza Archify l'HTML viene saltato con un avviso |
 | Costruzione del modello | l'agente, seguendo `references/model-building.md` | MVP | sostituita dal server MCP |
 | MCP server `livearch` | TypeScript, Node.js 22, `@modelcontextprotocol/sdk`, stdio | pianificato | specificato in `.kiro/specs/*`; porta in TS le regole degli script |
 | Parsing Terraform | parsing statico HCL; `terraform show -json` facoltativo | pianificato | |
@@ -21,6 +22,8 @@ codice deterministico. Il server MCP renderà deterministica anche la costruzion
 
 ## Perché
 - **Python stdlib per gli script**: le skill devono funzionare nel repo dell'utente senza `npm install` né venv.
+- **Archify come renderer esterno**: `render.py` scrive l'IR deterministico (`architecture.archify.json`), la CLI di
+  Archify produce l'HTML e applica i suoi gate di layout. Unica dipendenza non-stdlib, ed è facoltativa.
 - **CDK via synth**: il CloudFormation sintetizzato è l'unica rappresentazione affidabile; parsare il TypeScript
   di CDK porterebbe a risultati parziali.
 - **MCP server separato**: il rendering deterministico è codice, non generazione LLM. L'agente orchestra,

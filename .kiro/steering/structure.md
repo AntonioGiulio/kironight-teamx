@@ -16,7 +16,7 @@ inclusion: always
 │   ├── plugin.json                 # manifest Agent Plugins (keywords di attivazione)
 │   ├── README.md                   # (mcp.json arriverà con il server MCP pianificato)
 │   └── skills/
-│       ├── architecture-diagrams/  # genera e sincronizza modello + 3 diagrammi
+│       ├── architecture-diagrams/  # genera e sincronizza modello + diagrammi (draw.io, Mermaid, Archify)
 │       │   ├── SKILL.md
 │       │   ├── references/         # FONTE DI VERITÀ: model.schema.json, resource-catalog.json, model-building.md, guide formati
 │       │   └── scripts/            # render.py, validate_architecture.py, changeset.py (stdlib)
@@ -40,7 +40,8 @@ docs/architecture/
 ├── model.json                      # modello canonico (derivato, committato)
 ├── architecture.drawio
 ├── architecture.mmd
-└── architecture.archimate.xml
+├── architecture.archify.json       # IR Archify (deterministico)
+└── architecture.html               # vista interattiva, costruita dalla CLI di Archify
 .kiro/hooks/livearch-sync.json      # installato da setup-live-sync
 .kiro/steering/livearch.md          # installato da setup-live-sync
 ```

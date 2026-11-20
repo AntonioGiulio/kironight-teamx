@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Validate a LiveArch output folder (model.json + 3 diagrams) or the resource catalog.
+"""Validate a LiveArch output folder (model.json + draw.io, Mermaid, Archify) or the resource catalog.
 
 Usage:
     validate_architecture.py <dir>          # e.g. docs/architecture
     validate_architecture.py --catalog      # checks references/resource-catalog.json
 
-Checks: model structure and invariants, catalog consistency, the three diagrams are well formed and contain
-exactly the model's groups/nodes/edges, and no secret-like values appear in any output.
+Checks: model structure and invariants, catalog consistency, the diagrams are well formed and contain exactly the
+model's groups/nodes/edges (Archify: architecture.archify.json; architecture.html must come from the Archify CLI),
+and no secret-like values appear in the text outputs. Archify's own layout gates run in render.py.
 Exit code 0 = valid, 1 = errors found, 2 = usage error. Standard library only.
 """
 import json
@@ -17,17 +18,10 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REFS = HERE.parent / "references"
-ARCHI_NS = "{http://www.opengroup.org/xsd/archimate/3.0/}"
-XSI_TYPE = "{http://www.w3.org/2001/XMLSchema-instance}type"
-ARCHIMATE_TYPES = {
-    "Node", "Device", "SystemSoftware", "TechnologyCollaboration", "TechnologyInterface", "Path",
-    "CommunicationNetwork", "TechnologyFunction", "TechnologyProcess", "TechnologyInteraction",
-    "TechnologyEvent", "TechnologyService", "Artifact", "Grouping", "Location",
-}
-ARCHIMATE_RELATIONS = {
-    "Composition", "Aggregation", "Assignment", "Realization", "Serving", "Access", "Influence",
-    "Triggering", "Flow", "Specialization", "Association",
-}
+# Archify architecture schema v1 enums (componentType, variant, boundary kind).
+ARCHIFY_TYPES = {"frontend", "backend", "database", "cloud", "security", "messagebus", "external"}
+ARCHIFY_VARIANTS = {"default", "emphasis", "security", "dashed"}
+ARCHIFY_BOUNDARIES = {"region", "security-group"}
 SECRET_PATTERNS = [
     ("AWS access key", re.compile(r"\b(AKIA|ASIA)[0-9A-Z]{16}\b")),
     ("AWS account id", re.compile(r"(?<![0-9a-fA-F])\d{12}(?![0-9a-fA-F])")),
@@ -79,13 +73,16 @@ def check_catalog(catalog, report):
     for name, k in kinds.items():
         if not isinstance(k.get("tier"), int) or not 0 <= k["tier"] <= 5:
             report.error(w, f"kind {name}: tier must be an integer 0..5")
-        if k.get("archimate") not in ARCHIMATE_TYPES:
-            report.error(w, f"kind {name}: unknown ArchiMate type {k.get('archimate')!r}")
+        if k.get("archify") not in ARCHIFY_TYPES:
+            report.error(w, f"kind {name}: unknown Archify component type {k.get('archify')!r}")
         if not re.fullmatch(r"#[0-9A-Fa-f]{6}", k.get("drawio", {}).get("fillColor", "")):
             report.error(w, f"kind {name}: drawio.fillColor must be #RRGGBB")
     for name, e in catalog.get("edgeKinds", {}).items():
-        if e.get("archimate") not in ARCHIMATE_RELATIONS:
-            report.error(w, f"edgeKind {name}: unknown ArchiMate relationship {e.get('archimate')!r}")
+        if e.get("archify") not in ARCHIFY_VARIANTS:
+            report.error(w, f"edgeKind {name}: unknown Archify variant {e.get('archify')!r}")
+    for name, g in catalog.get("groupKinds", {}).items():
+        if g.get("archify") not in ARCHIFY_BOUNDARIES:
+            report.error(w, f"groupKind {name}: unknown Archify boundary kind {g.get('archify')!r}")
     seen = {}
     for section in ("resources", "groups", "hidden"):
         for entry in catalog.get(section, []):
@@ -295,55 +292,57 @@ def check_mermaid(path, model, report):
         report.error(w, f"edge {x[0]} {x[1]} {x[2]} not in model (or wrong arrow for its kind)")
 
 
-def check_archimate(path, model, report):
+def check_archify(folder, model, catalog, report):
+    path = folder / "architecture.archify.json"
     w = path.name
-    try:
-        root = ET.parse(path).getroot()
-    except (FileNotFoundError, ET.ParseError) as exc:
-        report.error(w, f"cannot parse: {exc}")
+    doc = load_json(path, report, w)
+    if doc is None:
         return
-    if root.tag != f"{ARCHI_NS}model":
-        report.error(w, "root element must be <model> in the ArchiMate 3.0 exchange namespace")
+    if doc.get("schema_version") != 1 or doc.get("diagram_type") != "architecture":
+        report.error(w, "must be an Archify architecture document (schema_version 1)")
         return
-    groups, nodes, edges = expected_ids(model)
-    elements = {el.get("identifier"): el.get(XSI_TYPE) for el in root.iter(f"{ARCHI_NS}element")}
-    for t in set(elements.values()) - ARCHIMATE_TYPES:
-        report.error(w, f"unknown element type {t}")
-    for x in sorted((groups | nodes) - set(elements)):
-        report.error(w, f"missing element {x}")
-    for x in sorted(set(elements) - groups - nodes):
-        report.error(w, f"element {x} not in model")
-    rels = {}
-    for rel in root.iter(f"{ARCHI_NS}relationship"):
-        rid = rel.get("identifier")
-        rels[rid] = rel
-        if rel.get(XSI_TYPE) not in ARCHIMATE_RELATIONS:
-            report.error(w, f"{rid}: unknown relationship type {rel.get(XSI_TYPE)}")
-        if rel.get("source") not in elements or rel.get("target") not in elements:
-            report.error(w, f"{rid}: source/target is not an element")
-        if rel.get(XSI_TYPE) == "Access" and elements.get(rel.get("target")) != "Artifact":
-            report.error(w, f"{rid}: Access must target an Artifact (fallback to Flow)")
-    for x in sorted(edges - set(rels)):
-        report.error(w, f"missing relationship {x}")
-    for g in model["groups"] + model["nodes"]:
-        parent = g.get("parent") if "parent" in g else g.get("group")
-        if parent and "la_m_" + sanitize(f"{parent}__{g['id']}") not in rels:
-            report.error(w, f"missing Aggregation for membership {parent} -> {g['id']}")
-    views = list(root.iter(f"{ARCHI_NS}view"))
-    if not views:
-        report.error(w, "missing view")
-        return
-    view_nodes = {n.get("identifier"): n.get("elementRef") for n in views[0].iter(f"{ARCHI_NS}node")}
-    for x in sorted((groups | nodes) - set(view_nodes.values())):
-        report.error(w, f"view has no node for {x}")
-    for c in views[0].iter(f"{ARCHI_NS}connection"):
-        if c.get("relationshipRef") not in rels or c.get("source") not in view_nodes or c.get("target") not in view_nodes:
-            report.error(w, f"connection {c.get('identifier')}: dangling reference")
+    kinds, edge_kinds = catalog["kinds"], catalog["edgeKinds"]
+    _, nodes, edges = expected_ids(model)
+    comps = {c.get("id"): c for c in doc.get("components", [])}
+    for x in sorted(nodes - set(comps)):
+        report.error(w, f"missing component {x}")
+    for x in sorted(set(comps) - nodes):
+        report.error(w, f"component {x} not in model")
+    for n in model["nodes"]:
+        c = comps.get(n["diagramId"])
+        if c and c.get("type") != kinds[n["kind"]]["archify"]:
+            report.error(w, f"{n['diagramId']}: type {c.get('type')} expected {kinds[n['kind']]['archify']}")
+        if c and not (isinstance(c.get("pos"), list) and isinstance(c.get("size"), list)):
+            report.error(w, f"{n['diagramId']}: pos and size are required")
+    conns = {c.get("id"): c for c in doc.get("connections", [])}
+    for x in sorted(edges - set(conns)):
+        report.error(w, f"missing connection {x}")
+    for x in sorted(set(conns) - edges):
+        report.error(w, f"connection {x} not in model")
+    for e in model["edges"]:
+        c = conns.get(e["diagramId"])
+        if c is None:
+            continue
+        if (c.get("from"), c.get("to")) != ("la_" + sanitize(e["from"]), "la_" + sanitize(e["to"])):
+            report.error(w, f"{e['diagramId']}: from/to do not match the model")
+        if c.get("variant") != edge_kinds[e["kind"]]["archify"]:
+            report.error(w, f"{e['diagramId']}: variant {c.get('variant')} expected {edge_kinds[e['kind']]['archify']}")
+    for b in doc.get("boundaries", []):
+        if b.get("kind") not in ARCHIFY_BOUNDARIES:
+            report.error(w, f"boundary {b.get('label')!r}: invalid kind {b.get('kind')!r}")
+        for x in b.get("wraps", []):
+            if x not in comps:
+                report.error(w, f"boundary {b.get('label')!r} wraps unknown component {x}")
+    html = folder / "architecture.html"
+    if not html.exists():
+        report.warn("architecture.html", "not built (Archify CLI missing?): run render.py with Archify installed")
+    elif 'name="generator" content="archify' not in html.read_text(encoding="utf-8", errors="replace")[:4000]:
+        report.error("architecture.html", "not generated by Archify")
 
 
 def check_secrets(folder, report):
     for path in sorted(folder.iterdir()):
-        if path.suffix not in {".json", ".drawio", ".mmd", ".xml"}:
+        if path.suffix not in {".json", ".drawio", ".mmd"}:
             continue
         text = path.read_text(encoding="utf-8", errors="replace")
         for name, pattern in SECRET_PATTERNS:
@@ -373,7 +372,7 @@ def main(argv):
         if not report.errors:
             check_drawio(folder / "architecture.drawio", model, report)
             check_mermaid(folder / "architecture.mmd", model, report)
-            check_archimate(folder / "architecture.archimate.xml", model, report)
+            check_archify(folder, model, catalog, report)
     if folder.is_dir():
         check_secrets(folder, report)
     if model is not None and not report.errors:

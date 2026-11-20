@@ -11,7 +11,7 @@ ricostruisce, e mantiene aggiornato in tempo reale, il disegno dell'architettura
 |---------|------|----------|
 | draw.io | `docs/architecture/architecture.drawio` | team, wiki, presentazioni (layout modificabile a mano) |
 | Mermaid | `docs/architecture/architecture.mmd` | README, PR, GitHub (renderizzato nativamente) |
-| ArchiMate (Open Group Exchange Format, importabile in Archi) | `docs/architecture/architecture.archimate.xml` | enterprise architect, governance |
+| Archify (HTML interattivo autocontenuto, [tt-a1i/archify](https://github.com/tt-a1i/archify)) | `docs/architecture/architecture.html` (+ IR `architecture.archify.json`) | onboarding, review, presentazioni: focus, percorsi, temi, export PNG/SVG |
 
 Tutti e tre derivano da **un unico modello canonico** (`docs/architecture/model.json`): i diagrammi non vengono mai
 scritti "a mano" dall'agente, ma renderizzati dal modello. Vedi `#[[file:.kiro/steering/architecture-model.md]]`.
@@ -23,13 +23,13 @@ L'IaC è già la fonte di verità dell'infrastruttura, ma non è leggibile da ch
 ## Utenti
 - **Platform / DevOps engineer**: modifica l'IaC e vuole il diagramma aggiornato senza sforzo.
 - **Sviluppatore nuovo nel team**: vuole capire l'infrastruttura in 5 minuti.
-- **Enterprise architect**: vuole il modello in ArchiMate dentro Archi, coerente con quanto deployato.
+- **Architect / tech lead**: vuole una vista interattiva da condividere e presentare (un solo file HTML), coerente con quanto deployato.
 - **Reviewer di PR**: vuole vedere l'impatto architetturale di una modifica IaC.
 
 ## Funzionalità MVP
 1. **Ingestion IaC**: Terraform (HCL / `terraform show -json`), CloudFormation, CDK (via `cdk synth`). Provider: AWS.
 2. **Modello canonico**: risorse, gruppi (VPC, subnet, account, ambiente), relazioni, con ID stabili.
-3. **Rendering** deterministico in draw.io, Mermaid, ArchiMate.
+3. **Rendering** deterministico in draw.io, Mermaid, Archify.
 4. **Live sync**: a ogni modifica di un file IaC il modello e i diagrammi vengono aggiornati in modo incrementale,
    **preservando il layout** modificato a mano in draw.io.
 5. **Validazione**: i tre diagrammi sono sempre ben formati e coerenti tra loro e con il modello.

@@ -1,6 +1,6 @@
 ---
 name: setup-live-sync
-description: Install LiveArch live sync in an Infrastructure as Code repository so the architecture diagrams (draw.io, Mermaid, ArchiMate) update automatically whenever Terraform, CDK or CloudFormation files change. Use when the user wants to keep architecture diagrams always up to date, enable automatic or real-time diagram sync, or set up LiveArch in a repo.
+description: Install LiveArch live sync in an Infrastructure as Code repository so the architecture diagrams (draw.io, Mermaid, Archify) update automatically whenever Terraform, CDK or CloudFormation files change. Use when the user wants to keep architecture diagrams always up to date, enable automatic or real-time diagram sync, or set up LiveArch in a repo.
 license: Apache-2.0
 compatibility: Kiro IDE 1.0+ or Kiro CLI V3 (hooks schema v1). Requires python3.
 metadata:

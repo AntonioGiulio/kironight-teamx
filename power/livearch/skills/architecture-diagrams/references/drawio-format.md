@@ -11,7 +11,7 @@ instead of overwriting. Reference implementation: `../scripts/render.py`.
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <object id="la__meta" label="LiveArch · catalog 1.0.0 · model 3f2a…" livearch_managed="meta" ...>
+        <object id="la__meta" label="LiveArch · catalog 1.1.0 · model 3f2a…" livearch_managed="meta" ...>
           <mxCell style="text;html=1;fontSize=9;fontColor=#7D8998;" vertex="1" parent="1">
             <mxGeometry x="40" y="5" width="360" height="20" as="geometry" />
           </mxCell>

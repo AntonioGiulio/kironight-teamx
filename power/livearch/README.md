@@ -5,10 +5,13 @@ Keeps your architecture diagram in sync with your Infrastructure as Code.
 ```
 Terraform / CDK / CloudFormation  →  model.json  →  architecture.drawio   (editable layout)
                                                   →  architecture.mmd      (GitHub / PR)
-                                                  →  architecture.archimate.xml (Archi)
+                                                  →  architecture.archify.json → architecture.html (Archify, interactive)
 ```
 
 ## Install
+Prerequisites: `python3` 3.10+. For the interactive HTML: Node.js and the [Archify](https://github.com/tt-a1i/archify)
+skill (`~/.kiro/skills/archify`, or set `ARCHIFY_HOME`).
+
 Kiro → Powers panel → **Add Custom Power** → **Import power from GitHub**, then paste
 `https://github.com/AntonioGiulio/kironight-teamx/tree/main/power/livearch`.
 You can also import it from a local folder.
@@ -21,7 +24,7 @@ You can also import it from a local folder.
 ## What it guarantees
 - **Deterministic**: the same IaC always produces the same bytes, so PR diffs stay readable.
 - **Your layout survives**: positions, styles and notes you change in draw.io are kept on every sync.
-- **Consistent**: `scripts/validate_architecture.py` checks that the three diagrams match the model and contain no secrets.
+- **Consistent**: `scripts/validate_architecture.py` checks that every diagram matches the model and contains no secrets; Archify adds its own layout gates.
 - **Safe**: read-only, offline, and it never deploys anything.
 
 ## Contents

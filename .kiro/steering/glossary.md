@@ -18,7 +18,7 @@ Termini da usare **sempre con questo significato** in codice, spec, skill e diag
 | **kind** | Categoria neutrale rispetto al provider (`database`, `queue`…), definita nel catalogo. |
 | **tier** | Colonna di layout (0–5) associata a un kind. |
 | **diagramId** | `la_` + indirizzo sanitizzato: l'ID usato in tutti e tre i formati. |
-| **Renderer** | Componente che trasforma il modello in un formato (drawio, mermaid, archimate). |
+| **Renderer** | Componente che trasforma il modello in un formato (drawio, mermaid, archify). |
 | **Sync** | Ciclo IaC → modello → renderer, eseguito su un repo esistente. **Incrementale** se riusa il modello precedente. |
 | **Live sync** | Sync attivata automaticamente da un hook alla modifica di un file IaC. |
 | **Cella gestita** | Cella draw.io con `livearch_managed="1"`. Le altre sono **celle utente** e sono intoccabili. |

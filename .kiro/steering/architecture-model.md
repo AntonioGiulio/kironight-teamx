@@ -5,7 +5,7 @@ fileMatchPattern: ["power/livearch/**", "examples/**", ".kiro/specs/**", "**/mod
 
 # Modello canonico (Intermediate Representation)
 
-Tutto passa dal modello: `IaC → adapter → model.json → renderer → {drawio, mmd, archimate.xml}`.
+Tutto passa dal modello: `IaC → adapter → model.json → renderer → {drawio, mmd, archify.json → html}`.
 Nessun renderer legge l'IaC, nessun adapter conosce i formati di output.
 
 Schema normativo: `#[[file:power/livearch/skills/architecture-diagrams/references/model.schema.json]]`
@@ -23,7 +23,7 @@ Se cambi una regola qui, va aggiornata anche lì. L'hook `design-rules-changed` 
    - CloudFormation / CDK: `<StackName>.<LogicalId>`, es. `ApiStack.OrdersQueue1A2B3C`.
 2. L'ID **non dipende** da label, tag, ordine nel file o attributi: rinominare un tag non cambia l'ID.
 3. ID dei diagrammi: `diagramId = "la_" + sanitize(id)` dove `sanitize` sostituisce ogni carattere fuori da
-   `[A-Za-z0-9_]` con `_`. È valido sia come ID Mermaid sia come `xs:ID` ArchiMate sia come id draw.io.
+   `[A-Za-z0-9_]` con `_`. È valido sia come ID Mermaid sia come id Archify (`^[a-zA-Z][a-zA-Z0-9_-]*$`) sia come id draw.io.
    Vale anche per i gruppi. Niente `-` negli ID: in Mermaid confonde il parser degli archi.
 4. ID degli edge: `<from>--<kind>--><to>`; diagramId `la_e_` + sanitize.
 5. Una risorsa con `count`/`for_each` produce un nodo per istanza **solo** se le istanze sono ≤ 3; oltre, un nodo

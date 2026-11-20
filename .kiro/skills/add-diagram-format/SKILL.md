@@ -10,7 +10,7 @@ metadata:
 A format is a **pure function of the model** (plus the previous file, if people can edit it). It never reads IaC.
 
 ## 1. Decide the editing policy
-- **Regenerated** (like Mermaid and ArchiMate): simplest, since people never edit the file.
+- **Regenerated** (like Mermaid and Archify): simplest, since people never edit the file.
 - **Merged** (like draw.io): you must define identity (the `diagramId`), what is preserved (geometry, style) and how
   user content is recognised. Copy the merge rules table from `references/drawio-format.md` and adapt it.
 

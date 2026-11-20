@@ -1,8 +1,8 @@
 ---
 name: architecture-diagrams
-description: Generate or update the architecture diagram of an Infrastructure as Code repository (Terraform, AWS CDK, CloudFormation) as draw.io, Mermaid and ArchiMate files in docs/architecture/. Use when the user asks to draw, generate, refresh or sync the architecture diagram, or when an IaC file changed and the LiveArch hook asks for a sync.
+description: Generate or update the architecture diagram of an Infrastructure as Code repository (Terraform, AWS CDK, CloudFormation) as draw.io, Mermaid and Archify (interactive HTML) files in docs/architecture/. Use when the user asks to draw, generate, refresh or sync the architecture diagram, or when an IaC file changed and the LiveArch hook asks for a sync.
 license: Apache-2.0
-compatibility: Requires python3 (3.10+, standard library only). Works offline. Never needs cloud credentials.
+compatibility: Requires python3 (3.10+, standard library only). The Archify HTML also needs Node.js and the Archify skill (https://github.com/tt-a1i/archify); without them every other file is still produced. Works offline. Never needs cloud credentials.
 metadata:
   author: KiroNight Team X
   version: 0.1.0
@@ -10,8 +10,9 @@ metadata:
 
 # Architecture diagrams from IaC
 
-The pipeline is always **IaC → `model.json` → three rendered diagrams**. You build the model; deterministic scripts
-draw the diagrams. **Never write or edit `architecture.drawio`, `architecture.mmd` or `architecture.archimate.xml` yourself.**
+The pipeline is always **IaC → `model.json` → rendered diagrams** (draw.io, Mermaid, Archify JSON + HTML). You build
+the model; deterministic scripts draw the diagrams. **Never write or edit `architecture.drawio`, `architecture.mmd`,
+`architecture.archify.json` or `architecture.html` yourself**, and never use the Archify skill to author them by hand.
 
 All paths under `scripts/` and `references/` are relative to this skill's folder. Output goes to `docs/architecture/`
 in the user's IaC repo, unless the user picks another folder.
@@ -51,6 +52,8 @@ python3 scripts/render.py docs/architecture/model.json
 ```
 The script merges into the existing draw.io file. It keeps the positions and styles a person changed, and never
 touches cells a person added. If it stops on a compressed draw.io file, ask the user to save it uncompressed.
+It then calls the Archify CLI to build `architecture.html`. If it prints `skip architecture.html`, tell the user to
+install Archify (or set `ARCHIFY_HOME`). If Archify rejects the layout, report its diagnostic: do not edit the JSON.
 
 ### 5. Validate (mandatory)
 ```bash
@@ -61,10 +64,11 @@ fails after 2 attempts, show the errors to the user and stop.
 
 ### 6. Report
 Report in at most 5 lines: the changeset output, the model's `warnings` (e.g. `UNMAPPED_TYPE`, `REMOTE_MODULE`), and
-the paths of the three files. Mention that ArchiMate imports into Archi via *File → Import → Open Exchange XML Model*.
+the paths of the files. Suggest opening `architecture.html` in a browser: it is the interactive view (focus, path
+tracing, presentation mode with `F`).
 
 ## References (load only when needed)
 - `references/model-building.md`: how to turn IaC into the model (IDs, groups, hidden resources, edges). **Always read it before step 2.**
 - `references/resource-catalog.json`: type → kind → notation mapping, property allowlist.
 - `references/model.schema.json`: the model contract.
-- `references/drawio-format.md`, `references/mermaid-format.md`, `references/archimate-format.md`: output formats, for debugging validator errors.
+- `references/drawio-format.md`, `references/mermaid-format.md`, `references/archify-format.md`: output formats, for debugging validator errors.
