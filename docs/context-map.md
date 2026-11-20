@@ -72,6 +72,26 @@ Legend: blue = `inclusion: always`, green = `fileMatch`, yellow = `auto`.
 | **Building LiveArch** | Kiro working on this repo | `.kiro/steering`, `.kiro/specs`, `.kiro/skills`, `.kiro/hooks` |
 | **Using LiveArch** | Kiro working on *your* IaC repo | `power/livearch` (skills, references, scripts), plus the hook and steering that `setup-live-sync` installs |
 
+## Traceability matrix
+Every rule has one owner and is applied, specified and checked by named artifacts.
+
+| Rule / concern | Owner (source of truth) | Steering | Spec | Applied by (skill) | Checked by (hook / script) |
+|----------------|-------------------------|----------|------|--------------------|----------------------------|
+| IaC detection and parsing | `model-building.md` § Detection, Step 1 | `iac-sources.md` | ING-1…ING-7 | `architecture-diagrams` §1–2, `add-iac-source` | Stop gate (golden example) |
+| Type → kind → notation | `resource-catalog.json` | `architecture-model.md` | MOD-2, REN-1.5 | `add-resource-mapping` | `catalog-or-schema-changed`, `validate --catalog` |
+| Model contract | `model.schema.json` | `architecture-model.md` | MOD-1, MOD-3 | `architecture-diagrams` §2 | `validate_architecture.py` `check_model` |
+| Groups and edges | `model-building.md` Step 4–5 | `architecture-model.md` | MOD-5, MOD-6, MOD-9 | `architecture-diagrams` §2 | golden example, `design-rules-changed` |
+| Three consistent views | format guides in `references/` | `diagram-conventions.md` | REN-1…REN-5 | `architecture-diagrams` §4–5, `add-diagram-format` | `validate-golden-example-on-save`, Stop gate (idempotency) |
+| Hand layout survives | `drawio-format.md` | `diagram-conventions.md` | REN-2, SYNC-3.5 | `architecture-diagrams` §4 | Stop gate, demo step 4 |
+| Live sync | `setup-live-sync` assets | `product.md` | SYNC-1…SYNC-7 | `setup-live-sync`, `architecture-diagrams` | installed `livearch-sync.json` |
+| Generated files are read-only | installed hook | `diagram-conventions.md` | SYNC-5 | `architecture-diagrams` (hard rule) | `livearch-block-manual-diagram-writes` |
+| Secrets and dangerous commands | `security.md` | `security.md` | ING-6, MOD-7, REN-5.3, SYNC-4.3 | all skills (hard rules) | `guard-secrets-and-commands`, `check_secrets` |
+| Spec quality | `write-livearch-spec` | `glossary.md` (prefixes) | all | `write-livearch-spec` | `spec-traceability`, Stop gate |
+
+Spec status: the agent-driven pipeline (skills + Python scripts) is implemented and its tasks are ticked in MOD, REN and SYNC; the
+`livearch` MCP server (`detect_sources`, `parse_iac`, `build_model`, `render_diagrams`, `validate_diagrams`, `watch`)
+is specified but not built yet.
+
 ## Context decisions
 | Decision | Why |
 |----------|-----|
