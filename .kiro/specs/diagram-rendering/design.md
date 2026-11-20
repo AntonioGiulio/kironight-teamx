@@ -54,8 +54,22 @@ export interface ValidateResult { result: "OK" | "FAIL"; errors: string[]; warni
 // validate_diagrams({ root, folder }): ValidateResult
 ```
 
-Il tool `render_diagrams` è l'unico del server che scrive file e lancia un processo figlio (la CLI di Archify):
-è dichiarato nel descrittore MCP e non apre connessioni di rete.
+Il tool `render_diagrams` è l'unico del server che scrive file e lancia un processo figlio (la CLI di Archify, con
+`execFile` e argomenti in array, senza shell): è dichiarato nel descrittore MCP e non apre connessioni di rete.
+
+### Parità TypeScript ↔ Python (REN-7.2, REN-7.3)
+- Costanti di layout (`NODE_W`, `COL_W`, `ROW_H`, `PAD`, `TOP`, `GAP`, `MIN_GROUP_W`, `MIN_GROUP_H`, `ORIGIN`) in un
+  unico `layout-constants.ts`, con gli stessi valori di `render.py`.
+- Serializzatore XML con lo stesso ordine degli attributi, gli stessi escape e la stessa indentazione di
+  `xml.etree.ElementTree` + `ET.indent(space="  ")`.
+- Numeri come li stampa Python (`str(int)`), SHA-256 sui byte UTF-8.
+- Gli output attesi si generano una volta con gli script Python e si committano: i test TypeScript non eseguono Python.
+
+### Scrittura atomica (REN-8)
+Oggi `render.py` scrive i tre file prima di chiamare Archify, quindi un rifiuto di Archify lascia `.drawio`, `.mmd` e
+`.archify.json` aggiornati e l'HTML vecchio. Con REN-8 tutti i file vanno in `<out>/.livearch-tmp/` e si spostano
+con `os.replace` / `fs.rename` solo se tutto è riuscito. La cartella temporanea sta nella stessa cartella di output,
+così che `rename` resti sullo stesso filesystem.
 
 ## Data models
 - Input: `model.schema.json`. Stili: `resource-catalog.json`.
@@ -67,7 +81,7 @@ Il tool `render_diagrams` è l'unico del server che scrive file e lancia un proc
 |------------|-----------|-----------|
 | draw.io compresso o senza `mxGraphModel/root` | stop, nessun file scritto, messaggio con la procedura | REN-2.6 |
 | Archify o Node.js assenti | tre file scritti, `skip architecture.html …`, `WARN` del validatore | REN-4.5, REN-5.4 |
-| Archify rifiuta l'IR (edge sopra nodi, edge sui bordi) | exit ≠ 0 + diagnostica; si corregge modello o layout | REN-4.6 |
+| Archify rifiuta l'IR (edge sopra nodi, edge sui bordi) | exit ≠ 0 + diagnostica; nessun file cambia (REN-8); si corregge modello o layout | REN-4.6, REN-8.2 |
 | Formati non allineati al modello | `ERROR <file>: missing …` / `… not in model` | REN-5.2 |
 | Segreto in un output | `ERROR <file>: possible <tipo> at line N` | REN-5.3 |
 
@@ -100,4 +114,5 @@ Il tool `render_diagrams` è l'unico del server che scrive file e lancia un proc
 | REN-4 | `render_archify`, `build_archify_html` | `archify finalize`, test senza CLI |
 | REN-5 | `validate_architecture.py` | mutazioni, hook `validate-golden-example-on-save` |
 | REN-6 | `render.py` | fixture `perf-200/` |
-| REN-7 | `server.ts` (`render_diagrams`, `validate_diagrams`) | `server.test.ts` |
+| REN-7 | `server.ts` (`render_diagrams`, `validate_diagrams`) | `server.test.ts`, `parity.test.ts` |
+| REN-8 | `render.py` (staging), `render/atomic.ts` | `atomic.test.ts` |

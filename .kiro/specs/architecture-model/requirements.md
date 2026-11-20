@@ -23,6 +23,8 @@ Regole operative: `power/livearch/skills/architecture-diagrams/references/model-
 2. **MOD-1.2**: THE SYSTEM SHALL ordinare `groups`, `nodes` ed `edges` per `id` e serializzare il JSON con indentazione di 2 spazi e newline finale.
 3. **MOD-1.3**: THE SYSTEM SHALL non scrivere timestamp nel modello; la provenienza è solo `source.commit` (o `null`) e `source.files[]` (`path`, `sha256`).
 4. **MOD-1.4**: WHEN lo stesso `RawResource[]` viene trasformato due volte, THE SYSTEM SHALL produrre due `model.json` identici byte per byte.
+5. **MOD-1.5**: THE SYSTEM SHALL impostare `generator.name = "livearch"` e `generator.version` uguale a `version` di `power/livearch/plugin.json`.
+6. **MOD-1.6**: WHEN cambia soltanto l'ordine dei `RawResource[]`, dei file o dei blocchi nei file, THE SYSTEM SHALL produrre lo stesso `model.json` byte per byte.
 
 ### MOD-2: Classificazione con il catalogo
 **User story:** Come platform engineer, voglio che ogni risorsa sia classificata sempre allo stesso modo, così che il diagramma non dipenda dall'LLM.
@@ -57,6 +59,7 @@ Regole operative: `power/livearch/skills/architecture-diagrams/references/model-
 3. **MOD-5.3**: THE SYSTEM SHALL impostare `group.parent` di una subnet al suo VPC e `group: null` per i nodi senza gruppo.
 4. **MOD-5.4**: WHEN il repo contiene più di un root module Terraform o più di uno stack CloudFormation/CDK, THE SYSTEM SHALL creare un gruppo `kind: "module"` per ciascuno; con un solo root module o stack, THE SYSTEM SHALL non crearlo.
 5. **MOD-5.5**: IF la catena `parent` contiene un ciclo o un gruppo inesistente, THEN THE SYSTEM SHALL fallire con l'errore `INVALID_GROUP_TREE` e non scrivere il modello.
+6. **MOD-5.6**: WHEN un `RawResource` ha `module` diverso da `null` (modulo Terraform locale o stack CloudFormation annidato, ING-3.2 e ING-5.3), THE SYSTEM SHALL creare un gruppo `kind: "module"` con `id` uguale a quel valore e assegnargli le risorse che non hanno un gruppo più specifico.
 
 ### MOD-6: Inferenza degli edge
 **User story:** Come reviewer, voglio frecce che dicano che tipo di relazione c'è, così che distingua traffico, dati ed eventi.
@@ -68,6 +71,8 @@ Regole operative: `power/livearch/skills/architecture-diagrams/references/model-
 5. **MOD-6.5**: WHEN due nodi visibili si referenziano e nessuna regola da MOD-6.1 a MOD-6.4 si applica, THE SYSTEM SHALL creare un edge `depends-on`.
 6. **MOD-6.6**: IF più regole producono edge tra la stessa coppia (`from`, `to`), THEN THE SYSTEM SHALL tenere solo quello di priorità più alta (`network-flow` > `trigger` > `data-access` > `depends-on`).
 7. **MOD-6.7**: THE SYSTEM SHALL non creare edge verso gruppi, edge di contenimento né self-edge.
+8. **MOD-6.8**: WHEN un riferimento passa da una o più risorse nascoste (`A → hidden → … → B`), THE SYSTEM SHALL trattarlo come riferimento diretto `A → B` per MOD-6.4 e MOD-6.5.
+9. **MOD-6.9**: WHEN il catalogo dichiara un `edgeInference` che non ha un'implementazione registrata, THE SYSTEM SHALL rifiutare il caricamento del catalogo con l'errore `UNKNOWN_EDGE_RULE` che indica il nome della regola.
 
 ### MOD-7: Allowlist delle proprietà
 **User story:** Come security engineer, voglio che nel modello entrino solo proprietà approvate, così che un nuovo attributo sensibile non trapeli per errore.
@@ -96,3 +101,6 @@ Regole operative: `power/livearch/skills/architecture-diagrams/references/model-
 
 1. **MOD-10.1**: WHERE il server MCP `livearch` è installato, THE SYSTEM SHALL esporre i tool `build_model` e `diff_models` con gli schemi di `design.md` § Components and interfaces.
 2. **MOD-10.2**: WHERE `build_model` riceve `previous`, THE SYSTEM SHALL riusare gli `id` del modello precedente per ogni indirizzo ancora presente e restituire il changeset di MOD-8 insieme al modello.
+3. **MOD-10.3**: WHEN `build_model` riceve `previous`, THE SYSTEM SHALL produrre un `model` identico byte per byte a quello prodotto senza `previous` sullo stesso input: `previous` serve solo al changeset.
+4. **MOD-10.4**: WHEN `diff_models` e `scripts/changeset.py` confrontano gli stessi due modelli, THE SYSTEM SHALL restituire un `summary` identico riga per riga all'output testuale di `changeset.py` e un `changeset` uguale al suo output `--json`.
+5. **MOD-10.5**: WHEN `parse_iac` e `build_model` vengono eseguiti in sequenza sulla fixture `perf-200` di ING (200 risorse in 20 file), THE SYSTEM SHALL completare entrambi in ≤ 3 s (mediana di 5 esecuzioni sulla macchina di riferimento).

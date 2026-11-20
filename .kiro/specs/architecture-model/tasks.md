@@ -34,14 +34,17 @@ server MCP `livearch`.
   - [ ] 6.1 `model/membership.ts`: BFS attraverso le risorse nascoste, priorità subnet > network, ordine di sorgente
   - [ ] 6.2 `parent` delle subnet, gruppi `module` solo con più root module o stack
   - [ ] 6.3 Errore `INVALID_GROUP_TREE` su cicli o parent mancanti
-  - [ ] 6.4 Test `membership.test.ts`: catena `db_instance → db_subnet_group → subnet`, repo con due stack
-  - _Requirements: MOD-5.1, MOD-5.2, MOD-5.3, MOD-5.4, MOD-5.5_
+  - [ ] 6.4 Gruppi `module` da `RawResource.module` (modulo locale, stack annidato)
+  - [ ] 6.5 Test `membership.test.ts`: catena `db_instance → db_subnet_group → subnet`, repo con due stack, modulo locale `module.network`
+  - _Requirements: MOD-5.1, MOD-5.2, MOD-5.3, MOD-5.4, MOD-5.5, MOD-5.6_
 
 - [ ] 7. Inferenza degli edge
-  - [ ] 7.1 `model/edges.ts`: regole `lb-listener`, `sg-ingress`, `event-source`/`subscription`, `data-access`, `depends-on`
-  - [ ] 7.2 Deduplica per coppia con priorità; nessun edge verso gruppi né self-edge
-  - [ ] 7.3 Test `edges.test.ts`: una fixture per regola, più il conflitto `data-access` vs `network-flow` del golden
-  - _Requirements: MOD-6.1, MOD-6.2, MOD-6.3, MOD-6.4, MOD-6.5, MOD-6.6, MOD-6.7, MOD-9.2_
+  - [ ] 7.1 `model/graph.ts`: grafo dei riferimenti con `collapsed()` che attraversa solo le risorse nascoste
+  - [ ] 7.2 `model/edges/<regola>.ts`, un modulo per `edgeInference` del catalogo (`lb-listener`, `sg-ingress`, `event-source`, `subscription`), più `data-access` e `depends-on`
+  - [ ] 7.3 Registro delle regole: un `edgeInference` del catalogo senza modulo → `UNKNOWN_EDGE_RULE`
+  - [ ] 7.4 Deduplica per coppia con priorità; nessun edge verso gruppi né self-edge
+  - [ ] 7.5 Test `edges.test.ts`: una fixture per regola, collasso `A → hidden → B`, regola sconosciuta, più il conflitto `data-access` vs `network-flow` del golden
+  - _Requirements: MOD-6.1, MOD-6.2, MOD-6.3, MOD-6.4, MOD-6.5, MOD-6.6, MOD-6.7, MOD-6.8, MOD-6.9, MOD-9.2_
 
 - [ ] 8. Allowlist e warning
   - [ ] 8.1 `model/allowlist.ts`: solo chiavi del catalogo con valore letterale, scarto di `<redacted>` e 12 cifre
@@ -50,13 +53,15 @@ server MCP `livearch`.
   - _Requirements: MOD-7.1, MOD-7.2, MOD-7.3_
 
 - [ ] 9. Assemblaggio e determinismo
-  - [ ] 9.1 `model/assemble.ts`: `generator`, `source`, ordinamento, chiavi nell'ordine dello schema, nessun timestamp
+  - [ ] 9.1 `model/assemble.ts`: `generator` (nome, versione da `plugin.json`, `catalogVersion`), `source`, ordinamento, chiavi nell'ordine dello schema, nessun timestamp
   - [ ] 9.2 Test `determinism.test.ts`: 50 permutazioni dell'input con seed fisso → stesso output byte per byte
-  - [ ] 9.3 Test `golden.test.ts`: `build_model(parse_iac(golden))` identico al `model.json` committato
-  - _Requirements: MOD-1.1, MOD-1.2, MOD-1.3, MOD-1.4, MOD-9.1, MOD-9.3_
+  - [ ] 9.3 Test `golden.test.ts`: `build_model(parse_iac(golden))` identico al `model.json` committato. Se il test rivela un errore nel golden (che oggi è costruito dall'agente), correggere il golden nello stesso commit, rigenerare i diagrammi con `render.py` e spiegare la correzione nel messaggio di commit
+  - _Requirements: MOD-1.1, MOD-1.2, MOD-1.3, MOD-1.4, MOD-1.5, MOD-1.6, MOD-9.1, MOD-9.3_
 
 - [ ] 10. Tool MCP
-  - [ ] 10.1 `build_model` e `diff_models` in `server.ts`, con `previous` per la sync incrementale
-  - [ ] 10.2 Porting di `changeset.py` in `model/changeset.ts` con output identico (test di confronto sulle fixture)
-  - [ ] 10.3 Test `server.test.ts`: chiamata end-to-end `parse_iac` → `build_model` sul golden
-  - _Requirements: MOD-10.1, MOD-10.2, MOD-8.1, MOD-8.2_
+  - [ ] 10.1 `build_model` e `diff_models` in `server.ts`, con `previous` usato solo per il changeset
+  - [ ] 10.2 Porting di `changeset.py` in `model/changeset.ts`; generare una volta con `changeset.py` (testo e `--json`) gli output attesi per 5 coppie in `test/fixtures/changesets/` e committarli, così che il test non lanci Python
+  - [ ] 10.3 Test `server.test.ts`: chiamata end-to-end `parse_iac` → `build_model` sul golden, con e senza `previous` (stesso `model`)
+  - [ ] 10.4 Test `perf.test.ts` su `perf-200`: mediana ≤ 3 s per `parse_iac` + `build_model`
+  - [ ] 10.5 Aggiornare `power/livearch/skills/architecture-diagrams/SKILL.md` (step 2–3) per usare `build_model`/`diff_models` quando il server è disponibile, e `.kiro/steering/tech.md` (costruzione del modello: MCP server)
+  - _Requirements: MOD-10.1, MOD-10.2, MOD-10.3, MOD-10.4, MOD-10.5, MOD-8.1, MOD-8.2_

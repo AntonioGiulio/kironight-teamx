@@ -28,9 +28,11 @@ Spuntato = presente negli asset e negli skill del Power.
   - [ ] 4.4 Scenario `.tf` rotto: hash dei file di `docs/architecture/` invariati
   - _Requirements: SYNC-2.1, SYNC-2.3, SYNC-3.5, SYNC-4.1, SYNC-5.1_
 
-- [ ] 5. Modalità watch (server MCP)
-  - [ ] 5.1 Tool `sync`, `watch`, `unwatch` in `server.ts` (orchestrano ING, MOD, REN)
-  - [ ] 5.2 Watcher con debounce di 2 s, una sync alla volta, esclusione di `docs/architecture/`, `.terraform/`, `node_modules/`, `.git/`
-  - [ ] 5.3 Test `watch.test.ts`: 10 salvataggi in 1 s → una sync; scrittura in `docs/architecture/` → nessuna sync
-  - [ ] 5.4 Aggiornare lo step 6 di `setup-live-sync` per proporre `watch` quando il server è installato
-  - _Requirements: SYNC-6.2, SYNC-6.3_
+- [ ] 5. Modalità watch e tool `sync` (server MCP)
+  - [ ] 5.1 Tool `sync` in `power/livearch/mcp/src/sync/sync.ts`: `parse_iac` → `build_model(previous)` → `render_diagrams` → `validate_diagrams`, con `SyncReport`
+  - [ ] 5.2 Lock in memoria per root, condiviso da `sync` e `watch`: seconda richiesta → `BUSY`
+  - [ ] 5.3 Tool `watch`/`unwatch`: watcher con debounce di 2 s, una sync alla volta, esclusione di `docs/architecture/`, `.terraform/`, `node_modules/`, `.git/`, notifica MCP con il `SyncReport`
+  - [ ] 5.4 Test `sync.test.ts`: golden copiato in una cartella temporanea, prima sync → `OK`, seconda → `NO_CHANGE` senza modifiche di mtime; due sync concorrenti → una `BUSY`
+  - [ ] 5.5 Test `watch.test.ts`: 10 salvataggi in 1 s → una sync e una notifica; scrittura in `docs/architecture/` → nessuna sync
+  - [ ] 5.6 Aggiornare lo step 6 di `setup-live-sync` per proporre `watch`, e il prompt dell'hook `livearch-sync-on-iac-change` e lo skill `architecture-diagrams` per usare il tool `sync` quando il server è installato
+  - _Requirements: SYNC-6.2, SYNC-6.3, SYNC-6.4, SYNC-8.1, SYNC-8.2, SYNC-8.3, SYNC-8.4_

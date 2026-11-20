@@ -58,11 +58,14 @@ Tool MCP (futuro):
 
 ```ts
 export interface WatchInput { root: string; outDir?: string; debounceMs?: number /* default 2000 */ }
-export interface SyncReport { changeset: string[]; warnings: Warning[]; written: string[]; result: "OK" | "FAIL" | "PARSE_ERROR" | "NO_CHANGE" }
-// sync({ root, outDir? }): SyncReport            — parse_iac → build_model(previous) → render_diagrams → validate_diagrams
-// watch(WatchInput): { watching: string[] }      — notifica un SyncReport per ogni ciclo
+export interface SyncReport { changeset: string[]; warnings: Warning[]; written: string[]; result: "OK" | "FAIL" | "PARSE_ERROR" | "NO_CHANGE" | "BUSY" }
+// sync({ root, outDir? }): SyncReport            — parse_iac → build_model(previous) → render_diagrams → validate_diagrams (SYNC-8)
+// watch(WatchInput): { watching: string[] }      — notifica MCP con un SyncReport per ogni ciclo (SYNC-6.4)
 // unwatch({ root }): { stopped: boolean }
 ```
+
+`sync` e `watch` condividono un lock in memoria per root (SYNC-8.2): il server è un processo stdio per sessione,
+quindi non serve un lock su file.
 
 ## Data models
 - Changeset e riepilogo: MOD-8 (`scripts/changeset.py`).
@@ -110,3 +113,4 @@ non sono riusciti; i diagrammi si toccano solo dopo.
 | SYNC-5 | `livearch-block-manual-diagram-writes` | test dell'hook |
 | SYNC-6 | `setup-live-sync` step 6, tool `watch` | test del debounce |
 | SYNC-7 | `setup-live-sync` § Uninstall | manuale |
+| SYNC-8 | `mcp/src/sync/sync.ts` (tool `sync`) | `sync.test.ts` |

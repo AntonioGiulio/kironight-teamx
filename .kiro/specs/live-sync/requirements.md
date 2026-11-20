@@ -62,8 +62,17 @@ file generati e la modalità watch del server MCP.
 1. **SYNC-6.1**: WHEN l'installazione termina, THE SYSTEM SHALL spiegare in una frase che gli hook scattano solo sulle modifiche dell'agente e che dopo una modifica manuale basta chiedere "sync the architecture".
 2. **SYNC-6.2**: WHERE il server MCP `livearch` è installato e l'utente attiva `watch`, THE SYSTEM SHALL osservare i file dei pattern di SYNC-2.1 e avviare una sync 2 s dopo l'ultima modifica (debounce), una sola alla volta.
 3. **SYNC-6.3**: WHILE la modalità watch è attiva, THE SYSTEM SHALL ignorare le modifiche in `docs/architecture/`, `.terraform/`, `node_modules/` e `.git/`, così che il render non riavvii la sync.
+4. **SYNC-6.4**: WHEN un ciclo di watch termina, THE SYSTEM SHALL inviare al client MCP una notifica con il `SyncReport` (`changeset`, `warnings`, `written`, `result`) di `design.md`.
 
 ### SYNC-7: Disinstallazione
 **User story:** Come utente, voglio poter rimuovere LiveArch senza perdere i diagrammi, così che provarlo non abbia costi.
 
 1. **SYNC-7.1**: WHEN l'utente chiede di disinstallare la live sync, THE SYSTEM SHALL cancellare solo `.kiro/hooks/livearch-sync.json` e `.kiro/steering/livearch.md` e lasciare `docs/architecture/` invariata.
+
+### SYNC-8: Tool `sync` del server MCP
+**User story:** Come utente di Kiro, voglio un unico comando deterministico per la sync, così che hook, watch e richieste manuali diano lo stesso risultato.
+
+1. **SYNC-8.1**: WHERE il server MCP `livearch` è installato, THE SYSTEM SHALL esporre il tool `sync` che esegue in sequenza `parse_iac` (ING), `build_model` con `previous` (MOD), `render_diagrams` (REN) e `validate_diagrams` (REN) e restituisce un `SyncReport`.
+2. **SYNC-8.2**: WHILE una sync è in corso su una root, THE SYSTEM SHALL rifiutare una seconda sync sulla stessa root con il risultato `BUSY`, sia che arrivi dal tool `sync` sia dalla modalità watch.
+3. **SYNC-8.3**: WHEN `sync` viene eseguito due volte di seguito senza modifiche all'IaC, THE SYSTEM SHALL restituire alla seconda esecuzione `result: "NO_CHANGE"` e non modificare alcun file.
+4. **SYNC-8.4**: WHERE il server MCP `livearch` è disponibile, THE SYSTEM SHALL far eseguire la sync dello skill `architecture-diagrams` tramite il tool `sync` invece della costruzione manuale del modello.
